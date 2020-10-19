@@ -1,0 +1,137 @@
+
+A popular way to structure projects is to group similar files together, for example:
+src/
+  components/
+     DisplayCards.js
+     DisplayCards.css
+     SomeotherComponents.js
+     SomeotherComponents.css
+  index.js
+import React, { useState } from "react";
+
+const productsArray = [
+  {
+    productId: "productId1",
+    name: "Product1",
+    upvotes: 30,
+    downvotes: 11,
+  },
+  {
+    productId: "productId2",
+    name: "Product2",
+    upvotes: 12,
+    downvotes: 10,
+  },
+  {
+    productId: "productId3",
+    name: "Product3",
+    upvotes: 18,
+    downvotes: 15,
+  },
+  {
+    productId: "productId4",
+    name: "Product4",
+    upvotes: 23,
+    downvotes: 38,
+  },
+  {
+    productId: "productId5",
+    name: "Product5",
+    upvotes: 16,
+    downvotes: 20,
+  },
+  {
+    productId: "productId6",
+    name: "Product6",
+    upvotes: 5,
+    downvotes: 1,
+  },
+  {
+    productId: "productId7",
+    name: "Product7",
+    upvotes: 3,
+    downvotes: 18,
+  },
+  {
+    productId: "productId8",
+    name: "Product8",
+    upvotes: 8,
+    downvotes: 11,
+  },
+];
+function ProductCard({ product, upvote, downvote }) {
+  const styles = {
+    padding: ".5rem",
+    margin: ".5rem auto",
+    border: "2px solid black",
+    width: "20rem",
+  };
+  return (
+    <div style={styles}>
+      <h2>{product.name}</h2>
+      <ul style={{ listStyleType: "none" }}>
+        <li>Upvotes: {product.upvotes}</li>
+        <li>Downvotes: {product.downvotes}</li>
+      </ul>
+      <div>
+        {/* you need to replace content of the buttons with whatever icon/content you like */}
+        <button data-target={product.productId} onClick={upvote}>
+          Upvote Button
+        </button>
+        <button data-target={product.productId} onClick={downvote}>
+          Downvote Button
+        </button>
+      </div>
+    </div>
+  );
+};
+
+function DisplayCards(props) {
+  const [products, setProducts] = useState(productsArray);
+  const upvote = event => {
+    const productId = event.currentTarget.getAttribute("data-target");
+    setProducts(prevState => {
+      return prevState.map(product => {
+        if (product.productId == productId) return { ...product, upvotes: product.upvotes + 1 };
+        else return product;
+      });
+    });
+  };
+  const downvote = event => {
+    const productId = event.currentTarget.getAttribute("data-target");
+    setProducts(prevState => {
+      return prevState.map(product => {
+        if (product.productId == productId) return { ...product, downvotes: product.downvotes + 1 };
+        else return product;
+      });
+    });
+  };
+  const sortProducts = (basedOn, order) => {
+    setProducts(prevState => {
+      prevState.sort((a, b) => {
+        if (basedOn === "upvotes") {
+          if (order === "ascending") return a.upvotes - b.upvotes;
+          else return b.upvotes - a.upvotes;
+        } else {
+          if (order === "ascending") return a.downvotes - b.downvotes;
+          else return b.downvotes - a.downvotes;
+        }
+      });
+      return prevState.slice();//so that we are not mutating state, otherwise render won't get affected;
+    });
+  };
+  return (
+    <div>
+      {products.map(product => (
+        <ProductCard key={Math.random()*100123} product={product} upvote={upvote} downvote={downvote} />
+      ))}
+      <div>
+        <button onClick={() => sortProducts("upvotes", "ascending")}>Sort by upvotes in ascending order</button>
+        <button onClick={() => sortProducts("upvotes", "descending")}>Sort by upvotes in descending order</button>
+        <button onClick={() => sortProducts("downvotes", "ascending")}>Sort by downvotes in ascending order</button>
+        <button onClick={() => sortProducts("downvotes", "descending")}>Sort by downvotes in descending order</button>
+      </div>
+    </div>
+  );
+}
+export default DisplayCards;
